@@ -84,7 +84,7 @@
                         </div>
                     </div>
                     <allsong v-if="!openPlaylist" :songs="songs" @addToPlayList="addToPlayList" @playsong="playSong"></allsong>
-                    <playlist v-if="openPlaylist" :songs="user.songs" @addToPlayList="addToPlayList" @playsong="playSong"></playlist>
+                    <playlist v-if="openPlaylist" :songs="user.songs" @playsong="playSong"></playlist>
                     <!-- <div class="overflow-scroll h-[50vh]">
                         <div class="pb-1 flex justify-between items-center mb-2 mt-9">
                             <span class="text-base font-semibold uppercase text-white">

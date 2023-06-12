@@ -5,11 +5,11 @@
             Danh sách bài hát</span>
     </div>
     <div class="overflow-scroll h-[50vh]">
-        <div @click="playSong(song.id)" v-for="song in songs" :key="song.id" class="flex py-2 cursor-pointer hover:shadow-md items-center relative" x-data="{openModal: false}">
-            <img class="w-10 h-10 object-cover rounded-lg mr-3" alt="User avatar" :src="song.thumb" />
+        <div v-for="song in songs" :key="song.id" class="flex py-2 cursor-pointer hover:shadow-md items-center relative" x-data="{openModal: false}">
+            <img @click="playSong(song.id)" class="w-10 h-10 object-cover rounded-lg mr-3" alt="User avatar" :src="song.thumb" />
             <div class="flex flex-col w-full">
-                <span class="text-sm text-white capitalize font-semibold pt-1">
-                    {{ song.name }}
+                <span class="text-sm text-white capitalize font-semibold pt-1" @click="playSong(song.id)">
+                    {{ song.name }} 
                 </span>
                 <span class="text-xs text-gray-500 font-medium">
                     <span v-for="(artist, index) in song.artists" :key="artist.id">{{ artist.name
