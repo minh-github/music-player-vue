@@ -86,6 +86,7 @@ export default {
         },
         updateUser(data) {
             this.store.commit("setUser", data);
+            this.$emit('reload');
         },
 
         loginAccount(event) {
@@ -94,7 +95,6 @@ export default {
                 email: this.email,
                 password: this.password,
             };
-
             axios.post('public/api/auth/login', userData)
                 .then(Response => {
                     this.updateUser(Response.data)
