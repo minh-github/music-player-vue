@@ -188,12 +188,14 @@ export default {
             valueRange: 0,
             music: "",
             timeLine: null,
-            songdDefault: 1,
+            songdDefault: JSON.parse(localStorage.getItem('lastSong')) ? JSON.parse(localStorage.getItem('lastSong')) : 1,
             openModalLogin: false,
             openModalRegist: false,
             token: '',
             openPlaylist: false,
-            alertLogin: false
+            // openPlaylist: JSON.parse(localStorage.getItem('openPlayList')) ? JSON.parse(localStorage.getItem('openPlayList')) : false,
+            alertLogin: false,
+            playlistDefault: JSON.parse(localStorage.getItem('lastplaylist')),
         };
     },
     beforeUnmount() {
@@ -203,21 +205,28 @@ export default {
         if (JSON.parse(localStorage.getItem('user')))
             this.login();
         await this.getAllSong()
+        this.getPlayListSong(this.playlistDefault)
     },
     methods: {
         handleKeyDown(event) {
             if (event.key === ' ' || event.key === 'k') {
                 this.isPlay = !this.isPlay
             }
-            if(event.key === 'ArrowRight' || event.key === 'l'){
+            if(event.key === 'ArrowRight'){
                 this.isPlay = false
                 this.music.currentTime+= 5;
                 this.isPlay = true
             }
-            if(event.key === 'ArrowLeft' || event.key === 'j'){
+            if(event.key === 'ArrowLeft'){
                 this.isPlay = false
                 this.music.currentTime-= 5;
                 this.isPlay = true
+            }
+            if (event.key === 'l') {
+                this.nextSong()
+            }
+            if (event.key === 'j') {
+                this.preveSong()
             }
         },
         getAllSong() {
@@ -357,6 +366,7 @@ export default {
                 });
         },
         getPlayListSong(id) {
+            this.playlistDefault = id
             axios
                 .get("public/api/get-playlist-song/" + id, {
                     headers: {
@@ -459,6 +469,16 @@ export default {
             if (newValue) this.startTimer();
             else this.stopTimer();
         },
+        song(newValue){
+            localStorage.setItem('lastSong', JSON.stringify(newValue.id));
+        },
+        openPlaylist(newValue){
+            localStorage.setItem('openPlayList', JSON.stringify(newValue.id));
+        },
+        playlistDefault(newValue){
+            console.log(newValue);
+            localStorage.setItem('lastplaylist', JSON.stringify(newValue));
+        }
     },
     components: {
         login,
