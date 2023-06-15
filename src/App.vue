@@ -67,9 +67,6 @@
                                     <span class="text-sm text-white capitalize font-semibold pt-1">
                                         {{ item.name }}
                                     </span>
-                                    <!-- <span class="text-xs text-gray-500 font-medium">
-                                        <span v-for="(artist, index) in song.artists" :key="artist.id">{{ artist.name }}{{ index < song.artists.length - 1 ? ", " : "" }}</span>
-                                    </span> -->
                                 </div>
                             </div>
                         </div>
@@ -86,7 +83,7 @@
                         </div>
                     </div>
                     <allsong v-if="!openPlaylist" :songs="songs" :userPlaylist="user.playlist" :nowsong="song" @addToPlayList="addToPlayList" @playsong="getSongToPlay"></allsong>
-                    <playlist v-if="openPlaylist" :songs="user.songs" :nowsong="song" @playsong="getSongToPlay" @setListSong="setListSong"></playlist>
+                    <playlist v-if="openPlaylist" :songs="user.songs" :user="user.name" :nowsong="song" @updateToApp="updateToApp" @playsong="getSongToPlay" @setListSong="setListSong"></playlist>
                 </div>
             </div>
             <div class="flex fixed z-20 h-[90px] bg-black bottom-0 w-full flex-col sm:flex-row items-center">
@@ -144,7 +141,7 @@
                   () => {
                     this.isPlay = true;
                   }
-                " @change="setCurrent()" class="timeLine h-1 overflow-hidden w-full cursor-pointer appearance-none rounded-lg bg-[#4d4d4d]" />
+                " @change="setCurrent()" class="timeLine outline-none h-1 overflow-hidden w-full cursor-pointer appearance-none rounded-lg bg-[#4d4d4d]" />
                         <span>{{ duration }}</span>
                     </div>
                 </div>
@@ -199,12 +196,30 @@ export default {
             alertLogin: false
         };
     },
+    beforeUnmount() {
+        document.body.removeEventListener('keydown', this.handleKeyDown);
+    },
     async mounted() {
-        if(JSON.parse(localStorage.getItem('user')))
-        this.login();
+        if (JSON.parse(localStorage.getItem('user')))
+            this.login();
         await this.getAllSong()
     },
     methods: {
+        handleKeyDown(event) {
+            if (event.key === ' ' || event.key === 'k') {
+                this.isPlay = !this.isPlay
+            }
+            if(event.key === 'ArrowRight' || event.key === 'l'){
+                this.isPlay = false
+                this.music.currentTime+= 5;
+                this.isPlay = true
+            }
+            if(event.key === 'ArrowLeft' || event.key === 'j'){
+                this.isPlay = false
+                this.music.currentTime-= 5;
+                this.isPlay = true
+            }
+        },
         getAllSong() {
             axios
                 .get("public/api/get-songs")
@@ -212,6 +227,7 @@ export default {
                     this.songs = response.data.songs
                     this.playSong(this.songdDefault, false);
                     this.sortSongs();
+                    document.body.addEventListener('keydown', this.handleKeyDown);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -281,7 +297,7 @@ export default {
         },
         addToPlayList(data) {
             axios
-                .get("public/api/add-song-playlist/" + data.id +'/'+ data.list, {
+                .get("public/api/add-song-playlist/" + data.id + '/' + data.list, {
                     headers: {
                         "Authorization": `Bearer ${this.token}`
                     }
@@ -293,7 +309,7 @@ export default {
                     console.error(error);
                 });
         },
-        reload(){
+        reload() {
             this.login();
             this.getAllPlaylist();
         },
@@ -324,7 +340,7 @@ export default {
                     console.error(error);
                 });
         },
-        getAllPlaylist(){
+        getAllPlaylist() {
             this.token = JSON.parse(localStorage.getItem('user'));
             axios
                 .get("public/api/get-all-playlist", {
@@ -398,7 +414,7 @@ export default {
             this.songs = list
         },
         addNewPlayList() {
-            if(JSON.parse(localStorage.getItem('user'))){
+            if (JSON.parse(localStorage.getItem('user'))) {
                 axios
                     .get("public/api/new-playlist", {
                         headers: {
@@ -412,7 +428,7 @@ export default {
                     .catch((error) => {
                         console.error(error);
                     });
-            }else{
+            } else {
                 this.alertLogin = true
                 setTimeout(() => {
                     this.alertLogin = false
@@ -423,9 +439,19 @@ export default {
             this.openPlaylist = false
             this.getAllSong();
         },
-        logout(){
+        logout() {
             localStorage.removeItem('user');
             window.location.reload();
+        },
+        updateToApp(data) {
+            console.log(data);
+            let index = this.user.playlist.findIndex((obj) => obj.id === data.id);
+            if (data.thumb != '') {
+                this.user.playlist[index].thumb = data.thumb
+            }
+            if (data.name != '') {
+                this.user.playlist[index].name = data.name
+            }
         }
     },
     watch: {

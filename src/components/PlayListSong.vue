@@ -36,14 +36,15 @@
                 <div class="flex flex-col space-y-2 justify-betwee" x-on:mouseover="EditName=true" x-on:mouseleave="EditName=false">
                     <div class="text-white text-xs font-semibold">Playlist</div>
                     <span class="text-3xl relative font-bold uppercase text-white">
-                        {{ playListInfo.name }}
+                        <div v-if="!openModalEdtName">{{ playListInfo.name }}</div>
+                        <input ref="myInput" @change="saveNamePlaylist" v-model="playListInfo.name" v-if="openModalEdtName" class="bg-transparent outline-none uppercase" type="text">
                         <div v-on:click="editName" class=" absolute -right-3 -top-5 text-sm cursor-pointer text-white" x-show="EditName">
                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
                             </svg>
                         </div>
                     </span>
-                    <div class="text-white text-xs font-semibold">Minh Phạm • 2 songs, 10 min 37 sec</div>
+                    <div class="text-white text-xs font-semibold">{{ author }} • {{ playListSongs.length+1 }} songs</div>
                 </div>
             </div>
         </div>
@@ -81,14 +82,16 @@ import {
 } from 'vue'
 import axios from "axios";
 export default {
-    props: ['songs', 'nowsong'],
+    props: ['songs', 'nowsong', 'user'],
     data() {
         return {
             playListSongs: this.songs.songs,
             playListInfo: this.songs,
             currentSong: this.nowsong,
             EditPhoto: false,
-            imageThumb: this.songs.thumb
+            imageThumb: this.songs.thumb,
+            openModalEdtName: false,
+            author: this.user
         }
     },
     mounted() {
@@ -121,6 +124,7 @@ export default {
             var formData = new FormData();
             let playlistId = this.playListInfo.id
             formData.append("image", imageFile.value);
+
             axios.post("public/api/update-play-list/" + playlistId, formData, {
                     headers: {
                         'Access-Control-Allow-Origin': '*',
@@ -128,14 +132,46 @@ export default {
                     }
                 }).then((response) => {
                     this.imageThumb = response.data.imageSrc
+                    this.updateToApp()
                     return response.data;
                 })
                 .catch((error) => {
                     console.error(error);
                 });
         },
-        editName(){
-            
+        editName() {
+            this.openModalEdtName = true
+            this.$nextTick(() => {
+                this.$refs.myInput.focus();
+            });
+        },
+        saveNamePlaylist(event){
+            let newName = event.target.value
+            var formData = new FormData();
+            let playlistId = this.playListInfo.id
+            formData.append("name", newName);
+            axios.post("public/api/update-play-list/" + playlistId, formData, {
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'content-type': 'multipart/form-data'
+                    }
+                }).then((response) => {
+                    this.playListInfo.name = response.data.name
+                    this.openModalEdtName = false
+                    this.updateToApp()
+                    return response.data;
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        },
+        updateToApp(){
+            let thumb = this.imageThumb
+            let name = this.playListInfo.name
+            let playlistId = this.playListInfo.id
+            this.$emit('updateToApp', {
+                playlistId, thumb, name
+            })
         }
     },
     watch: {
