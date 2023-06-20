@@ -95,7 +95,7 @@ export default {
                 email: this.email,
                 password: this.password,
             };
-            axios.post('public/api/auth/login', userData)
+            axios.post('api/auth/login', userData)
                 .then(Response => {
                     this.updateUser(Response.data)
                     this.closeModal();

@@ -141,7 +141,7 @@
                   () => {
                     this.isPlay = true;
                   }
-                " @change="setCurrent()" class="timeLine outline-none h-1 overflow-hidden w-full cursor-pointer appearance-none rounded-lg bg-[#4d4d4d]" />
+                " @change="setCurrent()" class="timeLine outline-none h-1 w-full cursor-pointer rounded-lg" />
                         <span>{{ duration }}</span>
                     </div>
                 </div>
@@ -231,7 +231,7 @@ export default {
         },
         getAllSong() {
             axios
-                .get("public/api/get-songs")
+                .get("api/get-songs")
                 .then((response) => {
                     this.songs = response.data.songs
                     this.playSong(this.songdDefault, false);
@@ -283,7 +283,7 @@ export default {
                 this.music.pause();
             }
             this.song = await axios
-                .get("public/api/get-song/" + id)
+                .get("api/get-song/" + id)
                 .then((response) => {
                     return response.data.song;
                 })
@@ -306,7 +306,7 @@ export default {
         },
         addToPlayList(data) {
             axios
-                .get("public/api/add-song-playlist/" + data.id + '/' + data.list, {
+                .get("api/add-song-playlist/" + data.id + '/' + data.list, {
                     headers: {
                         "Authorization": `Bearer ${this.token}`
                     }
@@ -333,7 +333,7 @@ export default {
         login() {
             this.token = JSON.parse(localStorage.getItem('user'));
             axios
-                .get("public/api/get-user", {
+                .get("api/get-user", {
                     headers: {
                         "Authorization": `Bearer ${this.token}`
                     }
@@ -352,7 +352,7 @@ export default {
         getAllPlaylist() {
             this.token = JSON.parse(localStorage.getItem('user'));
             axios
-                .get("public/api/get-all-playlist", {
+                .get("api/get-all-playlist", {
                     headers: {
                         "Authorization": `Bearer ${this.token}`
                     }
@@ -368,7 +368,7 @@ export default {
         getPlayListSong(id) {
             this.playlistDefault = id
             axios
-                .get("public/api/get-playlist-song/" + id, {
+                .get("api/get-playlist-song/" + id, {
                     headers: {
                         "Authorization": `Bearer ${this.token}`
                     }
@@ -426,7 +426,7 @@ export default {
         addNewPlayList() {
             if (JSON.parse(localStorage.getItem('user'))) {
                 axios
-                    .get("public/api/new-playlist", {
+                    .get("api/new-playlist", {
                         headers: {
                             "Authorization": `Bearer ${this.token}`
                         }
@@ -476,7 +476,6 @@ export default {
             localStorage.setItem('openPlayList', JSON.stringify(newValue.id));
         },
         playlistDefault(newValue){
-            console.log(newValue);
             localStorage.setItem('lastplaylist', JSON.stringify(newValue));
         }
     },
@@ -560,5 +559,14 @@ export default {
     to {
         opacity: 1;
     }
+}
+
+.timeLine::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0;
+    height: 0;
+    border: none;
+    opacity: 0;
 }
 </style>

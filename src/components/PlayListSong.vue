@@ -125,7 +125,7 @@ export default {
             let playlistId = this.playListInfo.id
             formData.append("image", imageFile.value);
 
-            axios.post("public/api/update-play-list/" + playlistId, formData, {
+            axios.post("api/update-play-list/" + playlistId, formData, {
                     headers: {
                         'Access-Control-Allow-Origin': '*',
                         'content-type': 'multipart/form-data'
@@ -150,7 +150,7 @@ export default {
             var formData = new FormData();
             let playlistId = this.playListInfo.id
             formData.append("name", newName);
-            axios.post("public/api/update-play-list/" + playlistId, formData, {
+            axios.post("api/update-play-list/" + playlistId, formData, {
                     headers: {
                         'Access-Control-Allow-Origin': '*',
                         'content-type': 'multipart/form-data'

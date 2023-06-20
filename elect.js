@@ -17,7 +17,7 @@ app.on('ready', function () {
         );
 
     // Specify entry point to default entry point of vue.js
-    win.loadURL('http://localhost:8080');
+    win.loadURL('http://localhost:8082');
     // Remove window once app is closed
     win.on('closed', function () {
         win = null;

@@ -109,7 +109,7 @@ export default {
                 password_confirmation: this.passwordConfirm,
             };
 
-            axios.post('public/api/auth/register', userData)
+            axios.post('api/auth/register', userData)
                 .then(() => {
                     this.closeModal();
                 })
